@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AndroidRTC</string>
+    <!--<string name="host">ns37269.ip-91-121-3.eu</string>-->
+    <!--<string name="host">192.168.1.17</string>-->
+    <!--<string name="port">3000</string>-->
+    <!--<string name="port">8080</string>-->
+    <string name="host">192.168.1.14</string>
+    <string name="port">8080</string>
+    <string name="action_settings">Options</string>
+    <string name="noPairedDevices">No paired devices, searching new devices</string>
+    <string name="findedPairedDevices">Paired devices finded</string>
+    <string name="defaultSpinnerMessage">Seaching paired bluetooth devices</string>
+</resources>
