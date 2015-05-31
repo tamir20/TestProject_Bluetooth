@@ -83,7 +83,7 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
     private Firebase mFirebaseRef;
     private String DATA;
     private int lock = 0;
-    private String robot_id = "";
+    private String robot_id = "123456"; // instead of just ""
     private String callID = "";
 
     private static final int REQUEST_ENABLE_BT = 105;
@@ -221,13 +221,44 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
 
             }
         });
+        mFirebaseRef.child("users/try").setValue("Temp1");
+        mFirebaseRef.child("users/try").setValue("Temp2");
+        mFirebaseRef.child("users/robot_"+robot_id+"/robot_response").setValue("CONNECTION_OK");
         //set the listener to handle "CONNECTION_ISSUE"
-        /*mFirebaseRef.addValueEventListener(new ValueEventListener() {
+        mFirebaseRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 if(snapshot.child("users/robot_"+robot_id+"/robot_response").getValue().toString()=="CONNECTION_ISSUE") {
                     mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("CONNECTION_OK");
                     setFirebase();
+                }
+                if(snapshot.child("users/robot_"+robot_id+"/robot_response").getValue().toString()=="GO_FORWARD") {
+                    if (null != currentDevice && null != bConnection) {
+                        byte[] msg = charSequenceToByteArray("a");
+                        bConnection.write(msg);
+                    }
+                    mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("MOVEMENT_OK");
+                }
+                if(snapshot.child("users/robot_"+robot_id+"/robot_response").getValue().toString()=="GO_LEFT") {
+                    if (null != currentDevice && null != bConnection) {
+                        byte[] msg = charSequenceToByteArray("b");
+                        bConnection.write(msg);
+                    }
+                    mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("MOVEMENT_OK");
+                }
+                if(snapshot.child("users/robot_"+robot_id+"/robot_response").getValue().toString()=="GO_RIGHT") {
+                    if (null != currentDevice && null != bConnection) {
+                        byte[] msg = charSequenceToByteArray("c");
+                        bConnection.write(msg);
+                    }
+                    mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("MOVEMENT_OK");
+                }
+                if(snapshot.child("users/robot_"+robot_id+"/robot_response").getValue().toString()=="GO_BACK") {
+                    if (null != currentDevice && null != bConnection) {
+                        byte[] msg = charSequenceToByteArray("d");
+                        bConnection.write(msg);
+                    }
+                    mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("MOVEMENT_OK");
                 }
             }
 
@@ -235,9 +266,7 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
             public void onCancelled(FirebaseError firebaseError) {
 
             }
-        });*/
-        mFirebaseRef.child("users/try").setValue("Temp1");
-        mFirebaseRef.child("users/try").setValue("Temp2");
+        });
         vsv = (GLSurfaceView) findViewById(R.id.glview_call);
         vsv.setPreserveEGLContextOnPause(true);
         vsv.setKeepScreenOn(true);
