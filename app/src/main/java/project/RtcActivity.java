@@ -224,41 +224,43 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
         mFirebaseRef.child("users/try").setValue("Temp1");
         mFirebaseRef.child("users/try").setValue("Temp2");
         mFirebaseRef.child("users/robot_"+robot_id+"/robot_response").setValue("CONNECTION_OK");
-        //set the listener to handle "CONNECTION_ISSUE"
+        //set the listener to handle "ISSUE_CONNECTION" and more
         mFirebaseRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                if(snapshot.child("users/robot_"+robot_id+"/robot_response").getValue().toString()=="CONNECTION_ISSUE") {
-                    mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("CONNECTION_OK");
-                    setFirebase();
-                }
-                if(snapshot.child("users/robot_"+robot_id+"/robot_response").getValue().toString()=="GO_FORWARD") {
-                    if (null != currentDevice && null != bConnection) {
-                        byte[] msg = charSequenceToByteArray("a");
-                        bConnection.write(msg);
+                if(snapshot.child("users/robot_"+robot_id+"/server_request").exists()) {
+                    if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString() == "ISSUE_CONNECTION") {
+                        setFirebase();
+                        mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("CONNECTION_OK");
                     }
-                    mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("MOVEMENT_OK");
-                }
-                if(snapshot.child("users/robot_"+robot_id+"/robot_response").getValue().toString()=="GO_LEFT") {
-                    if (null != currentDevice && null != bConnection) {
-                        byte[] msg = charSequenceToByteArray("b");
-                        bConnection.write(msg);
+                    if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString() == "GO_FORWARD") {
+                        if (null != currentDevice && null != bConnection) {
+                            byte[] msg = charSequenceToByteArray("a");
+                            bConnection.write(msg);
+                        }
+                        mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("MOVEMENT_OK");
                     }
-                    mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("MOVEMENT_OK");
-                }
-                if(snapshot.child("users/robot_"+robot_id+"/robot_response").getValue().toString()=="GO_RIGHT") {
-                    if (null != currentDevice && null != bConnection) {
-                        byte[] msg = charSequenceToByteArray("c");
-                        bConnection.write(msg);
+                    if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString() == "GO_LEFT") {
+                        if (null != currentDevice && null != bConnection) {
+                            byte[] msg = charSequenceToByteArray("b");
+                            bConnection.write(msg);
+                        }
+                        mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("MOVEMENT_OK");
                     }
-                    mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("MOVEMENT_OK");
-                }
-                if(snapshot.child("users/robot_"+robot_id+"/robot_response").getValue().toString()=="GO_BACK") {
-                    if (null != currentDevice && null != bConnection) {
-                        byte[] msg = charSequenceToByteArray("d");
-                        bConnection.write(msg);
+                    if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString() == "GO_RIGHT") {
+                        if (null != currentDevice && null != bConnection) {
+                            byte[] msg = charSequenceToByteArray("c");
+                            bConnection.write(msg);
+                        }
+                        mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("MOVEMENT_OK");
                     }
-                    mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("MOVEMENT_OK");
+                    if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString() == "GO_BACK") {
+                        if (null != currentDevice && null != bConnection) {
+                            byte[] msg = charSequenceToByteArray("d");
+                            bConnection.write(msg);
+                        }
+                        mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("MOVEMENT_OK");
+                    }
                 }
             }
 
