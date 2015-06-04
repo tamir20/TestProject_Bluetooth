@@ -125,6 +125,11 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //had to do that before bluetooth init because it uses the mFirebaseRef
+        //initialize firebase library
+        Firebase.setAndroidContext(this);
+        //initiate firebase reference
+        mFirebaseRef = new Firebase(FIREBASE_URL);
         //------------------------------BLUETOOTH INIT----------------------------------------
         currentDevice = null;
         bConnection = null;
@@ -182,7 +187,7 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
         try {
             currentDevice = devicesList.get(0);
             String name = currentDevice.getName();
-            bConnection = new BluetoothConnection(currentDevice,name,uuid,mHandler,this);
+            bConnection = new BluetoothConnection(currentDevice,name,uuid,mHandler,this, mFirebaseRef,robot_id);
             bConnection.start();
         } catch (Exception e) {
             // TODO Auto-generated catch block
@@ -193,10 +198,6 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
         //-----------------------------END BLUETOOTH INIT-------------------------------------
         //thi will be changed to the right one later on
         host = "temp";
-        //initialize firebase library
-        Firebase.setAndroidContext(this);
-        //initiate firebase reference
-        mFirebaseRef = new Firebase(FIREBASE_URL);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().addFlags(
                 LayoutParams.FLAG_FULLSCREEN
@@ -357,13 +358,15 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
         if(length == 0)
             return null;
 
-        byte[] retval = new byte[length];
+        byte[] retval = new byte[length+1];
 
         for(int i=0; i<length; i++)
         {
             retval[i] = (byte) message.charAt(i);
         }
-
+        //NEW CHANGE FOR ROBOT INTEGRATION!!
+        retval[length] = (byte)'\n';
+        //END OF NEW CHANGE
         return retval;
     }
 
@@ -455,22 +458,6 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
     }
 
     public void call(String callId) {
-        // my change to avoid the gmail choosing
-        /*Intent msg = new Intent(Intent.ACTION_SEND);
-        msg.putExtra(Intent.EXTRA_TEXT, mSocketAddress + callId);
-        msg.setType("text/plain");
-        startActivityForResult(Intent.createChooser(msg, "Call someone :"), VIDEO_CALL_SENT);*/
-        //for now ill send mail to myself, but later on ill update firebase argument
-        /*Intent i = new Intent(Intent.ACTION_SEND);
-        i.setType("message/rfc822");
-        i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"tamirtamir20@gmail.com"});
-        i.putExtra(Intent.EXTRA_SUBJECT, "vhh");
-        i.putExtra(Intent.EXTRA_TEXT   , mSocketAddress + callId);
-        try {
-            startActivity(Intent.createChooser(i, "Send mail..."));
-        } catch (android.content.ActivityNotFoundException ex) {
-            Toast.makeText(RtcActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
-        }*/
 
         //setFirebase(callId); was originally here but we want the robot's id to be constant, so
         // we determine its value to be the first call id
@@ -581,9 +568,11 @@ class BluetoothConnection extends Thread {
     private InputStream inStream;
     private OutputStream outStream;
     private RtcActivity act;
+    private Firebase mFirebaseRef;
+    private String robot_id;
 
     //public BluetoothConnection(BluetoothAdapter adapter, String Name, UUID uuid, Handler mHand, MainActivity ac) {
-    public BluetoothConnection(BluetoothDevice adapter, String Name, UUID uuid, Handler mHand, RtcActivity ac) {
+    public BluetoothConnection(BluetoothDevice adapter, String Name, UUID uuid, Handler mHand, RtcActivity ac,Firebase FIREBASE, String robot) {
         // Use a temporary object that is later assigned to mmServerSocket,
         // because mmServerSocket is final
         BluetoothSocket tmp = null;
@@ -591,6 +580,8 @@ class BluetoothConnection extends Thread {
         outStream = null;
         mHandler = mHand;
         act = ac;
+        robot_id = robot;
+        mFirebaseRef = FIREBASE;
         try {
             // MY_UUID is the app's UUID string, also used by the client code
             //tmp = adapter.listenUsingRfcommWithServiceRecord(Name, uuid);
@@ -640,6 +631,7 @@ class BluetoothConnection extends Thread {
                             bytes = inStream.read(buffer);
 
                             //mHandler.obtainMessage(MainActivity.MESSAGE_READ, bytes, -1, buffer).sendToTarget();
+                            mFirebaseRef.child("users/robot_" + robot_id + "/bluetooth").setValue(bytes);
                         } catch (IOException e) {
                             break;
                         }
