@@ -9,14 +9,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Point;
+import android.hardware.Camera;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager.LayoutParams;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -210,11 +213,16 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
         mFirebaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                for (DataSnapshot child : snapshot.getChildren()) {
+                if(snapshot.child("host_ip").exists()) {
                     host = snapshot.child("host_ip").getValue().toString();
                     mFirebaseRef.child("users/try").setValue(host);
                     lock = 2;
                 }
+                /*for (DataSnapshot child : snapshot.getChildren()) {
+                    host = snapshot.child("host_ip").getValue().toString();
+                    mFirebaseRef.child("users/try").setValue(host);
+                    lock = 2;
+                }*/
             }
 
             @Override
@@ -261,6 +269,11 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
                             bConnection.write(msg);
                         }
                         mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("MOVEMENT_OK");
+                    }
+                    if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString() == "SHUT_DOWN") {
+                        Button t = (Button) findViewById(R.id.button3);
+                        t.setVisibility(View.VISIBLE);
+                        mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("SHUT_DOWN_OK");
                     }
                 }
             }
@@ -323,18 +336,6 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
             }
         }
     };
-
-    //    @Override
-    public void onClick(/*View v*/) {
-        CharSequence message = "a";
-        if (null != currentDevice && null != bConnection) {
-            printMessageOnTerminal(message);
-            byte[] msg = charSequenceToByteArray(message);
-            bConnection.write(msg);
-        } else {
-            //toastMessage(R.string.noCurrentDevice, Toast.LENGTH_SHORT);
-        }
-    }
 
     public void printMessageOnTerminal(CharSequence message) {
 		/*terminal.append("\n#>");
@@ -455,6 +456,8 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
     public void answer(String callerId) throws JSONException {
         client.sendMessage(callerId, "init", null);
         startCam();
+        Button t = (Button) findViewById(R.id.button2);
+        t.setVisibility(View.VISIBLE);
     }
 
     public void call(String callId) {
@@ -507,7 +510,7 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
 
     public void startCam() {
         // Camera settings
-        client.start("android_test");
+        client.start("Tele-Care Robot");
     }
 
     @Override
@@ -557,6 +560,23 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
         //the robot_id is not changing to ensure only 1 robot id until the end of the application.
         //callID is changing every time a new call is created
         mFirebaseRef.child("users/robot_"+robot_id+"/rtsp_stream_url").setValue(mSocketAddress + "/" +callID);
+    }
+
+    public void ChangeID(View view) {
+        String ID = "";
+        ID = ((EditText)findViewById(R.id.editText)).getText().toString();
+        if (!ID.equals("")) {
+            robot_id = ID;
+        }
+    }
+
+    public void Restart_Connection(View view) {
+        Button t = (Button) findViewById(R.id.button3);
+        t.setVisibility(View.VISIBLE);
+    }
+
+    public void CloseApp(View view) {
+        System.exit(0);
     }
 }
 
