@@ -270,10 +270,30 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
                         }
                         mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("MOVEMENT_OK");
                     }
+                    if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString() == "RETURN_TO_BASE") {
+                        if (null != currentDevice && null != bConnection) {
+                            byte[] msg = charSequenceToByteArray("e");
+                            bConnection.write(msg);
+                        }
+                        mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("MOVEMENT_OK");
+                    }
                     if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString() == "SHUT_DOWN") {
                         Button t = (Button) findViewById(R.id.button3);
                         t.setVisibility(View.VISIBLE);
                         mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("SHUT_DOWN_OK");
+                    }
+                    if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString() == "GET_DATA") {
+                        if(snapshot.child("users/robot_"+robot_id+"/server_request/number1").exists()&&snapshot.child("users/robot_"+robot_id+"/server_request/number2").exists()&&snapshot.child("users/robot_"+robot_id+"/server_request/number3").exists()&&snapshot.child("users/robot_"+robot_id+"/server_request/char").exists()) {
+                            int num1 = ConStringToInt(snapshot.child("users/robot_"+robot_id+"/server_request/number1").getValue().toString());
+                            int num2 = ConStringToInt(snapshot.child("users/robot_"+robot_id+"/server_request/number2").getValue().toString());
+                            int num3 = ConStringToInt(snapshot.child("users/robot_"+robot_id+"/server_request/number3").getValue().toString());
+                            char c = snapshot.child("users/robot_"+robot_id+"/server_request/number1").getValue().toString().charAt(0);
+                            if (null != currentDevice && null != bConnection) {
+                                byte[] msg = charSequenceToByteArray("f");
+                                bConnection.write(msg);
+                            }
+                        }
+                        mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("GET_DATA_OK");
                     }
                 }
             }
@@ -308,6 +328,22 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
             final List<String> segments = intent.getData().getPathSegments();
             callerId = segments.get(0);
         }
+        //this is test for ConStringToInt function
+        /*Button b = (Button)findViewById(R.id.button);
+        String a = "NO";
+        int num = ConStringToInt("2345");
+        for(int i = 0; i < num; i++) {
+            if (i == 2344) {
+                a = "YES";
+            }
+            if (i < 2344) {
+                a = "NO";
+            }
+            if (i > 2344) {
+                a = "NO";
+            }
+        }
+        b.setText(a);*/
     }
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -578,6 +614,18 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
 
     public void CloseApp(View view) {
         System.exit(0);
+    }
+
+    public int ConStringToInt(String st){
+        int num = 0;
+        int n = st.length();
+        for (int i = 0; i < n; i++){
+            int temp = (int)st.charAt(i);
+            temp-=48;
+            int temp2 = (int)Math.pow(10,n-i-1);
+            num+=temp*temp2;
+        }
+        return num;
     }
 }
 
