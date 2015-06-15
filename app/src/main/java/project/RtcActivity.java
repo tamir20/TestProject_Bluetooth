@@ -55,6 +55,17 @@ import android.annotation.SuppressLint;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import java.util.Timer;
+import java.util.TimerTask;
+import android.app.Activity;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.os.Handler.Callback;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+
 public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
     private final String FIREBASE_URL = "https://crackling-heat-6629.firebaseio.com/";
     private final static int VIDEO_CALL_SENT = 666;
@@ -237,52 +248,61 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
         mFirebaseRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
+                Button b = (Button)findViewById(R.id.button);
+                b.setText(snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString());
                 if(snapshot.child("users/robot_"+robot_id+"/server_request").exists()) {
-                    if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString() == "ISSUE_CONNECTION") {
+                    if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString().equals("ISSUE_CONNECTION")) {
                         setFirebase();
                         mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("CONNECTION_OK");
+                        mFirebaseRef.child("users/robot_" + robot_id + "/server_request").setValue("");
                     }
-                    if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString() == "GO_FORWARD") {
+                    if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString().equals("GO_FORWARD")) {
                         if (null != currentDevice && null != bConnection) {
                             byte[] msg = charSequenceToByteArray("a");
                             bConnection.write(msg);
                         }
                         mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("MOVEMENT_OK");
+                        mFirebaseRef.child("users/robot_" + robot_id + "/server_request").setValue("");
                     }
-                    if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString() == "GO_LEFT") {
+                    if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString().equals("GO_LEFT")) {
                         if (null != currentDevice && null != bConnection) {
                             byte[] msg = charSequenceToByteArray("b");
                             bConnection.write(msg);
                         }
                         mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("MOVEMENT_OK");
+                        mFirebaseRef.child("users/robot_" + robot_id + "/server_request").setValue("");
                     }
-                    if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString() == "GO_RIGHT") {
+                    if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString().equals("GO_RIGHT")) {
                         if (null != currentDevice && null != bConnection) {
                             byte[] msg = charSequenceToByteArray("c");
                             bConnection.write(msg);
                         }
                         mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("MOVEMENT_OK");
+                        mFirebaseRef.child("users/robot_" + robot_id + "/server_request").setValue("");
                     }
-                    if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString() == "GO_BACK") {
+                    if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString().equals("GO_BACK")) {
                         if (null != currentDevice && null != bConnection) {
                             byte[] msg = charSequenceToByteArray("d");
                             bConnection.write(msg);
                         }
                         mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("MOVEMENT_OK");
+                        mFirebaseRef.child("users/robot_" + robot_id + "/server_request").setValue("");
                     }
-                    if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString() == "RETURN_TO_BASE") {
+                    if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString().equals("RETURN_TO_BASE")) {
                         if (null != currentDevice && null != bConnection) {
                             byte[] msg = charSequenceToByteArray("e");
                             bConnection.write(msg);
                         }
                         mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("MOVEMENT_OK");
+                        mFirebaseRef.child("users/robot_" + robot_id + "/server_request").setValue("");
                     }
-                    if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString() == "SHUT_DOWN") {
+                    if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString().equals("SHUT_DOWN")) {
                         Button t = (Button) findViewById(R.id.button3);
                         t.setVisibility(View.VISIBLE);
                         mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("SHUT_DOWN_OK");
+                        mFirebaseRef.child("users/robot_" + robot_id + "/server_request").setValue("");
                     }
-                    if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString() == "GET_DATA") {
+                    if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString().equals("GET_DATA")) {
                         if(snapshot.child("users/robot_"+robot_id+"/server_request/number1").exists()&&snapshot.child("users/robot_"+robot_id+"/server_request/number2").exists()&&snapshot.child("users/robot_"+robot_id+"/server_request/number3").exists()&&snapshot.child("users/robot_"+robot_id+"/server_request/char").exists()) {
                             int num1 = ConStringToInt(snapshot.child("users/robot_"+robot_id+"/server_request/number1").getValue().toString());
                             int num2 = ConStringToInt(snapshot.child("users/robot_"+robot_id+"/server_request/number2").getValue().toString());
@@ -294,6 +314,7 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
                             }
                         }
                         mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("GET_DATA_OK");
+                        mFirebaseRef.child("users/robot_" + robot_id + "/server_request").setValue("");
                     }
                 }
             }
@@ -604,6 +625,15 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
         ID = ((EditText)findViewById(R.id.editText)).getText().toString();
         if (!ID.equals("")) {
             robot_id = ID;
+            mFirebaseRef.child("users/robot_" + robot_id + "/bluetooth").setValue("");
+            mFirebaseRef.child("users/robot_" + robot_id + "/char").setValue("");
+            mFirebaseRef.child("users/robot_" + robot_id + "/hosp_ip").setValue("");
+            mFirebaseRef.child("users/robot_" + robot_id + "/number1").setValue("");
+            mFirebaseRef.child("users/robot_" + robot_id + "/number2").setValue("");
+            mFirebaseRef.child("users/robot_" + robot_id + "/number3").setValue("");
+            mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("");
+            mFirebaseRef.child("users/robot_" + robot_id + "/rtsp_stream_url").setValue("");
+            mFirebaseRef.child("users/robot_" + robot_id + "/server_request").setValue("");
         }
     }
 
