@@ -305,10 +305,10 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
                     }
                     if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString().equals("GET_DATA")) {
                         if(snapshot.child("users/robot_"+robot_id+"/number1").exists()&&snapshot.child("users/robot_"+robot_id+"/number2").exists()&&snapshot.child("users/robot_"+robot_id+"/number3").exists()&&snapshot.child("users/robot_"+robot_id+"/char").exists()) {
-                            /*int num1 = ConStringToInt(snapshot.child("users/robot_"+robot_id+"/server_request/number1").getValue().toString());
-                            int num2 = ConStringToInt(snapshot.child("users/robot_"+robot_id+"/server_request/number2").getValue().toString());
-                            int num3 = ConStringToInt(snapshot.child("users/robot_"+robot_id+"/server_request/number3").getValue().toString());
-                            char c = snapshot.child("users/robot_"+robot_id+"/server_request/number1").getValue().toString().charAt(0);*/
+                            int num1 = ConStringToInt(snapshot.child("users/robot_"+robot_id+"/number1").getValue().toString());
+                            int num2 = ConStringToInt(snapshot.child("users/robot_"+robot_id+"/number2").getValue().toString());
+                            int num3 = ConStringToInt(snapshot.child("users/robot_"+robot_id+"/number3").getValue().toString());
+                            char c = snapshot.child("users/robot_"+robot_id+"/number1").getValue().toString().charAt(0);
                             if (null != currentDevice && null != bConnection) {
                                 byte[] msg = charSequenceToByteArray("f");
                                 bConnection.write(msg);
