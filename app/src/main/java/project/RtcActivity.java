@@ -248,8 +248,9 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
         mFirebaseRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                Button b = (Button)findViewById(R.id.button);
-                b.setText(snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString());
+                // test to get server_request
+                /*Button b = (Button)findViewById(R.id.button);
+                b.setText(snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString());*/
                 if(snapshot.child("users/robot_"+robot_id+"/server_request").exists()) {
                     if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString().equals("ISSUE_CONNECTION")) {
                         setFirebase();
@@ -303,11 +304,11 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
                         mFirebaseRef.child("users/robot_" + robot_id + "/server_request").setValue("");
                     }
                     if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString().equals("GET_DATA")) {
-                        if(snapshot.child("users/robot_"+robot_id+"/server_request/number1").exists()&&snapshot.child("users/robot_"+robot_id+"/server_request/number2").exists()&&snapshot.child("users/robot_"+robot_id+"/server_request/number3").exists()&&snapshot.child("users/robot_"+robot_id+"/server_request/char").exists()) {
-                            int num1 = ConStringToInt(snapshot.child("users/robot_"+robot_id+"/server_request/number1").getValue().toString());
+                        if(snapshot.child("users/robot_"+robot_id+"/number1").exists()&&snapshot.child("users/robot_"+robot_id+"/number2").exists()&&snapshot.child("users/robot_"+robot_id+"/number3").exists()&&snapshot.child("users/robot_"+robot_id+"/char").exists()) {
+                            /*int num1 = ConStringToInt(snapshot.child("users/robot_"+robot_id+"/server_request/number1").getValue().toString());
                             int num2 = ConStringToInt(snapshot.child("users/robot_"+robot_id+"/server_request/number2").getValue().toString());
                             int num3 = ConStringToInt(snapshot.child("users/robot_"+robot_id+"/server_request/number3").getValue().toString());
-                            char c = snapshot.child("users/robot_"+robot_id+"/server_request/number1").getValue().toString().charAt(0);
+                            char c = snapshot.child("users/robot_"+robot_id+"/server_request/number1").getValue().toString().charAt(0);*/
                             if (null != currentDevice && null != bConnection) {
                                 byte[] msg = charSequenceToByteArray("f");
                                 bConnection.write(msg);
@@ -524,7 +525,7 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
         // we determine its value to be the first call id
         //here we want the robot is to be 123456 only, but i want to save the option to make it
         //more general
-        if(robot_id == ""){
+        if(robot_id.equals("")){
             robot_id = "123456";// and not "callId"
         }
         callID = callId;
