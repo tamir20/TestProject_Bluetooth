@@ -833,7 +833,7 @@ class MyTimerTask extends TimerTask {
         if(level == 5){
             st = "5";
         }
-        mFirebaseRef.child("users/robot_" + robot_id + "/Signal").setValue(
+        mFirebaseRef.child("users/robot_" + robot_id + "/Signal").setValue(st);
 
     }
 }
