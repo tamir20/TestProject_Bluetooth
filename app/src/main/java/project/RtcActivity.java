@@ -10,6 +10,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Point;
 import android.hardware.Camera;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Handler;
@@ -99,6 +101,8 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
     private int lock = 0;
     private String robot_id = "123456"; // instead of just ""
     private String callID = "";
+    private WifiManager wifiManager;
+    private MyTimerTask myTimerTask;
 
     private static final int REQUEST_ENABLE_BT = 105;
     public static final int MESSAGE_READ = 106;
@@ -144,6 +148,7 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
         Firebase.setAndroidContext(this);
         //initiate firebase reference
         mFirebaseRef = new Firebase(FIREBASE_URL);
+        wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         //------------------------------BLUETOOTH INIT----------------------------------------
         currentDevice = null;
         bConnection = null;
@@ -210,7 +215,8 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
             printMessageOnTerminal(mes3 + e.getMessage());
         }
         //-----------------------------END BLUETOOTH INIT-------------------------------------
-        //thi will be changed to the right one later on
+        wifiManager = (WifiManager)getSystemService(Context.WIFI_SERVICE);
+        //this will be changed to the right one later on (automatically)
         host = "temp";
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().addFlags(
@@ -254,68 +260,72 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
                 if(snapshot.child("users/robot_"+robot_id+"/server_request").exists()) {
                     if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString().equals("ISSUE_CONNECTION")) {
                         setFirebase();
-                        mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("CONNECTION_OK");
                         mFirebaseRef.child("users/robot_" + robot_id + "/server_request").setValue("");
+                        mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("CONNECTION_OK");
                     }
                     if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString().equals("GO_FORWARD")) {
                         if (null != currentDevice && null != bConnection) {
-                            byte[] msg = charSequenceToByteArray("a");
+                            byte[] msg = charSequenceToByteArray("forward");
                             bConnection.write(msg);
                         }
-                        mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("MOVEMENT_OK");
                         mFirebaseRef.child("users/robot_" + robot_id + "/server_request").setValue("");
+                        mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("MOVEMENT_OK");
                     }
                     if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString().equals("GO_LEFT")) {
                         if (null != currentDevice && null != bConnection) {
-                            byte[] msg = charSequenceToByteArray("b");
+                            byte[] msg = charSequenceToByteArray("left");
                             bConnection.write(msg);
                         }
-                        mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("MOVEMENT_OK");
                         mFirebaseRef.child("users/robot_" + robot_id + "/server_request").setValue("");
+                        mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("MOVEMENT_OK");
                     }
                     if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString().equals("GO_RIGHT")) {
                         if (null != currentDevice && null != bConnection) {
-                            byte[] msg = charSequenceToByteArray("c");
+                            byte[] msg = charSequenceToByteArray("right");
                             bConnection.write(msg);
                         }
-                        mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("MOVEMENT_OK");
                         mFirebaseRef.child("users/robot_" + robot_id + "/server_request").setValue("");
+                        mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("MOVEMENT_OK");
                     }
                     if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString().equals("GO_BACK")) {
                         if (null != currentDevice && null != bConnection) {
-                            byte[] msg = charSequenceToByteArray("d");
+                            byte[] msg = charSequenceToByteArray("back");
                             bConnection.write(msg);
                         }
-                        mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("MOVEMENT_OK");
                         mFirebaseRef.child("users/robot_" + robot_id + "/server_request").setValue("");
+                        mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("MOVEMENT_OK");
                     }
                     if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString().equals("RETURN_TO_BASE")) {
                         if (null != currentDevice && null != bConnection) {
-                            byte[] msg = charSequenceToByteArray("e");
+                            byte[] msg = charSequenceToByteArray("return to base");
                             bConnection.write(msg);
                         }
-                        mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("MOVEMENT_OK");
                         mFirebaseRef.child("users/robot_" + robot_id + "/server_request").setValue("");
+                        mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("MOVEMENT_OK");
                     }
                     if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString().equals("SHUT_DOWN")) {
                         Button t = (Button) findViewById(R.id.button3);
                         t.setVisibility(View.VISIBLE);
-                        mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("SHUT_DOWN_OK");
                         mFirebaseRef.child("users/robot_" + robot_id + "/server_request").setValue("");
+                        mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("SHUT_DOWN_OK");
                     }
                     if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString().equals("GET_DATA")) {
                         if(snapshot.child("users/robot_"+robot_id+"/number1").exists()&&snapshot.child("users/robot_"+robot_id+"/number2").exists()&&snapshot.child("users/robot_"+robot_id+"/number3").exists()&&snapshot.child("users/robot_"+robot_id+"/char").exists()) {
-                            int num1 = ConStringToInt(snapshot.child("users/robot_"+robot_id+"/number1").getValue().toString());
-                            int num2 = ConStringToInt(snapshot.child("users/robot_"+robot_id+"/number2").getValue().toString());
-                            int num3 = ConStringToInt(snapshot.child("users/robot_"+robot_id+"/number3").getValue().toString());
-                            char c = snapshot.child("users/robot_"+robot_id+"/number1").getValue().toString().charAt(0);
+                            String n1 = snapshot.child("users/robot_"+robot_id+"/number1").getValue().toString();
+                            String n2 = snapshot.child("users/robot_"+robot_id+"/number2").getValue().toString();
+                            String n3 = snapshot.child("users/robot_"+robot_id+"/number3").getValue().toString();
+                            String character = snapshot.child("users/robot_"+robot_id+"/char").getValue().toString();
+                            int num1 = ConStringToInt(n1);
+                            int num2 = ConStringToInt(n2);
+                            int num3 = ConStringToInt(n3);
+                            char c = character.charAt(0);
                             if (null != currentDevice && null != bConnection) {
-                                byte[] msg = charSequenceToByteArray("f");
+                                byte[] msg = charSequenceToByteArray("custom cmd: "+character+", "+n1+", "+n2+", "+n3);
                                 bConnection.write(msg);
                             }
                         }
-                        mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("GET_DATA_OK");
                         mFirebaseRef.child("users/robot_" + robot_id + "/server_request").setValue("");
+                        mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("GET_DATA_OK");
                     }
                 }
             }
@@ -366,6 +376,10 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
             }
         }
         b.setText(a);*/
+        //WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        Timer timer = new Timer();
+        myTimerTask = new MyTimerTask(mFirebaseRef,wifiManager,robot_id);
+        timer.schedule(myTimerTask, 0, 2000);
     }
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -626,6 +640,7 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
         ID = ((EditText)findViewById(R.id.editText)).getText().toString();
         if (!ID.equals("")) {
             robot_id = ID;
+            myTimerTask.changeID(ID);
             mFirebaseRef.child("users/robot_" + robot_id + "/bluetooth").setValue("");
             mFirebaseRef.child("users/robot_" + robot_id + "/char").setValue("");
             mFirebaseRef.child("users/robot_" + robot_id + "/hosp_ip").setValue("");
@@ -635,6 +650,7 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
             mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("");
             mFirebaseRef.child("users/robot_" + robot_id + "/rtsp_stream_url").setValue("");
             mFirebaseRef.child("users/robot_" + robot_id + "/server_request").setValue("");
+            mFirebaseRef.child("users/robot_" + robot_id + "/Signal").setValue("");
         }
     }
 
@@ -777,3 +793,48 @@ class BluetoothConnection extends Thread {
         } catch (IOException e) { }
     }
 }
+
+class MyTimerTask extends TimerTask {
+
+    private Firebase mFirebaseRef;
+    private WifiManager wifiManager;
+    private String robot_id;
+    public MyTimerTask(Firebase FIREBASE, WifiManager WIFI, String ID) {
+        mFirebaseRef=FIREBASE;
+        wifiManager = WIFI;
+        robot_id = ID;
+    }
+
+    public void changeID(String ID){
+        robot_id = ID;
+    }
+
+    @Override
+    public void run() {
+        int numberOfLevels=5;
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        int level=WifiManager.calculateSignalLevel(wifiInfo.getRssi(), numberOfLevels);
+        String st = "";
+        if(level == 0){
+            st = "0";
+        }
+        if(level == 1){
+            st = "1";
+        }
+        if(level == 2){
+            st = "2";
+        }
+        if(level == 3){
+            st = "3";
+        }
+        if(level == 4){
+            st = "4";
+        }
+        if(level == 5){
+            st = "5";
+        }
+        mFirebaseRef.child("users/robot_" + robot_id + "/Signal").setValue(
+
+    }
+}
+
