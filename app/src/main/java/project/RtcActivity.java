@@ -265,7 +265,8 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
                     }
                     if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString().equals("GO_FORWARD")) {
                         if (null != currentDevice && null != bConnection) {
-                            byte[] msg = charSequenceToByteArray("forward");
+                            //byte[] msg = charSequenceToByteArray("forward");
+                            byte[] msg = charSequenceToByteArray("8");
                             bConnection.write(msg);
                         }
                         mFirebaseRef.child("users/robot_" + robot_id + "/server_request").setValue("");
@@ -273,7 +274,8 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
                     }
                     if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString().equals("GO_LEFT")) {
                         if (null != currentDevice && null != bConnection) {
-                            byte[] msg = charSequenceToByteArray("left");
+                            //byte[] msg = charSequenceToByteArray("left");
+                            byte[] msg = charSequenceToByteArray("4");
                             bConnection.write(msg);
                         }
                         mFirebaseRef.child("users/robot_" + robot_id + "/server_request").setValue("");
@@ -281,7 +283,8 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
                     }
                     if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString().equals("GO_RIGHT")) {
                         if (null != currentDevice && null != bConnection) {
-                            byte[] msg = charSequenceToByteArray("right");
+                            //byte[] msg = charSequenceToByteArray("right");
+                            byte[] msg = charSequenceToByteArray("6");
                             bConnection.write(msg);
                         }
                         mFirebaseRef.child("users/robot_" + robot_id + "/server_request").setValue("");
@@ -289,7 +292,17 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
                     }
                     if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString().equals("GO_BACK")) {
                         if (null != currentDevice && null != bConnection) {
-                            byte[] msg = charSequenceToByteArray("back");
+                            //byte[] msg = charSequenceToByteArray("back");
+                            byte[] msg = charSequenceToByteArray("2");
+                            bConnection.write(msg);
+                        }
+                        mFirebaseRef.child("users/robot_" + robot_id + "/server_request").setValue("");
+                        mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("MOVEMENT_OK");
+                    }
+                    if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString().equals("GO_STOP")) {
+                        if (null != currentDevice && null != bConnection) {
+                            //byte[] msg = charSequenceToByteArray("back");
+                            byte[] msg = charSequenceToByteArray("5");
                             bConnection.write(msg);
                         }
                         mFirebaseRef.child("users/robot_" + robot_id + "/server_request").setValue("");
@@ -297,8 +310,9 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
                     }
                     if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString().equals("RETURN_TO_BASE")) {
                         if (null != currentDevice && null != bConnection) {
-                            byte[] msg = charSequenceToByteArray("return to base");
-                            bConnection.write(msg);
+                            //byte[] msg = charSequenceToByteArray("return to base");
+                            /*byte[] msg = charSequenceToByteArray("5");
+                            bConnection.write(msg);*/
                         }
                         mFirebaseRef.child("users/robot_" + robot_id + "/server_request").setValue("");
                         mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("MOVEMENT_OK");
@@ -376,7 +390,6 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
             }
         }
         b.setText(a);*/
-        //WifiInfo wifiInfo = wifiManager.getConnectionInfo();
         Timer timer = new Timer();
         myTimerTask = new MyTimerTask(mFirebaseRef,wifiManager,robot_id);
         timer.schedule(myTimerTask, 0, 2000);
