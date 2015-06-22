@@ -663,7 +663,7 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
             mFirebaseRef.child("users/robot_" + robot_id + "/robot_response").setValue("");
             mFirebaseRef.child("users/robot_" + robot_id + "/rtsp_stream_url").setValue("");
             mFirebaseRef.child("users/robot_" + robot_id + "/server_request").setValue("");
-            mFirebaseRef.child("users/robot_" + robot_id + "/Signal").setValue("");
+            mFirebaseRef.child("users/robot_" + robot_id + "/signal").setValue("");
         }
     }
 
@@ -846,7 +846,7 @@ class MyTimerTask extends TimerTask {
         if(level == 5){
             st = "5";
         }
-        mFirebaseRef.child("users/robot_" + robot_id + "/Signal").setValue(st);
+        mFirebaseRef.child("users/robot_" + robot_id + "/signal").setValue(st);
 
     }
 }
