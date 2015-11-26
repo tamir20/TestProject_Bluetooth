@@ -302,7 +302,7 @@ public class RtcActivity extends Activity implements WebRtcClient.RtcListener {
                     if (snapshot.child("users/robot_" + robot_id + "/server_request").getValue().toString().equals("GO_STOP")) {
                         if (null != currentDevice && null != bConnection) {
                             byte[] msg = charSequenceToByteArray("stop");
-                            //byte[] msg = charSequenceToByteArray("5");
+                            //pbyte[] msg = charSequenceToByteArray("5");
                             bConnection.write(msg);
                         }
                         mFirebaseRef.child("users/robot_" + robot_id + "/server_request").setValue("");
